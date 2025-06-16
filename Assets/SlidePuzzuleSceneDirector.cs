@@ -11,13 +11,22 @@ public class SlidePuzzuleSceneDirector : MonoBehaviour
     [SerializeField] GameObject buttonRetry;
     // シャッフル回数
     [SerializeField] int shuffleCount;
+    // ゲーム終了画面
+    [SerializeField] GameObject panelResult;
+    // サウンド
+    [SerializeField] AudioClip seMove;
 
     // 初期位置
     List<Vector2> startPositions;
 
+    // サウンド
+    AudioSource audioSource;
+
     // Start is called before the first frame update
     void Start()
     {
+        // サウンド
+        audioSource = GetComponent<AudioSource>();
         // 初期位置を保存
         startPositions = new List<Vector2>();
         foreach (var item in pieces)
@@ -47,6 +56,9 @@ public class SlidePuzzuleSceneDirector : MonoBehaviour
 
         // ボタン非表示
         buttonRetry.SetActive(false);
+
+        // リザルト画面非表示
+        panelResult.SetActive(false);
     }
 
     // Update is called once per frame
@@ -55,6 +67,8 @@ public class SlidePuzzuleSceneDirector : MonoBehaviour
         // タッチ処理
         if (Input.GetMouseButtonUp(0))
         {
+            // SE再生
+            audioSource.PlayOneShot(seMove);
             // スクリーン座標からワールド座標に変換
             Vector2 worldPoint = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             // レイを飛ばす
@@ -88,7 +102,8 @@ public class SlidePuzzuleSceneDirector : MonoBehaviour
                 // クリア状態
                 if (buttonRetry.activeSelf)
                 {
-                    Debug.Log("クリア！");
+                    // ゲームクリア
+                    GameResult();
                 }
             }
         }
@@ -126,5 +141,14 @@ public class SlidePuzzuleSceneDirector : MonoBehaviour
     public void OnClickRetry()
     {
         SceneManager.LoadScene("SlidePuzzleScene");
+    }
+
+    void GameResult()
+    {
+        // リザルトパネル表示
+        panelResult.SetActive(true);
+
+        // Updateを停止
+        enabled = false;
     }
 }
